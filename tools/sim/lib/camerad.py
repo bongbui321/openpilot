@@ -8,6 +8,7 @@ from cereal import messaging
 
 from openpilot.common.basedir import BASEDIR
 from openpilot.tools.sim.lib.common import W, H
+from openpilot.tools.webcam.camera import Camera
 
 class Camerad:
   """Simulates the camerad daemon"""
@@ -26,7 +27,9 @@ class Camerad:
 
     # set up for pyopencl rgb to yuv conversion
     self.ctx = cl.create_some_context()
+    print("__c6")
     self.queue = cl.CommandQueue(self.ctx)
+    print("__c7")
     cl_arg = f" -DHEIGHT={H} -DWIDTH={W} -DRGB_STRIDE={W * 3} -DUV_WIDTH={W // 2} -DUV_HEIGHT={H // 2} -DRGB_SIZE={W * H} -DCL_DEBUG "
 
     kernel_fn = os.path.join(BASEDIR, "tools/sim/rgb_to_nv12.cl")
@@ -53,6 +56,7 @@ class Camerad:
     yuv_cl = cl_array.empty_like(rgb_cl)
     self.krnl(self.queue, (self.Wdiv4, self.Hdiv4), None, rgb_cl.data, yuv_cl.data).wait()
     yuv = np.resize(yuv_cl.get(), rgb.size // 2)
+    #yuv = Camera.bgr2nv12(rgb)
     return yuv.data.tobytes()
 
   def _send_yuv(self, yuv, frame_id, pub_type, yuv_type):

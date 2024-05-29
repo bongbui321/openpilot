@@ -18,6 +18,7 @@ class CopyRamRGBCamera(RGBCamera):
     img = img[:,:,:3] # RGBA to RGB
     # img = np.swapaxes(img, 1, 0)
     img = img[::-1] # Flip on vertical axis
+    #print("+++origin_image:", img)
     return img
 
 

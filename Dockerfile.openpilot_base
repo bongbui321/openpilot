@@ -4,7 +4,13 @@ ENV PYTHONUNBUFFERED 1
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends sudo tzdata locales ssh pulseaudio xvfb x11-xserver-utils gnome-screenshot && \
+    apt-get install -y --no-install-recommends sudo tzdata locales ssh pulseaudio xvfb x11-xserver-utils gnome-screenshot \
+                                                freeglut3-dev xinit \
+                                                mesa-utils \
+                                                xserver-xephyr \
+                                                libegl1-mesa libegl1-mesa-dev libgbm-dev libgbm1 \
+                                                libgl1-mesa-dev libgl1-mesa-dri \
+                                                libgl1-mesa-glx libglu1-mesa libglu1-mesa-dev wget && \
     rm -rf /var/lib/apt/lists/*
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
@@ -49,6 +55,11 @@ RUN cd /tmp/opencl-driver-intel && \
     echo /opt/intel/opencl_compilers_and_libraries_18.1.0.015/linux/compiler/lib/intel64_lin/libintelocl.so > /etc/OpenCL/vendors/intel.icd && \
     cd / && \
     rm -rf /tmp/opencl-driver-intel
+
+RUN mkdir -p /root/vgl
+RUN cd /root/vgl/ && \
+    wget "https://github.com/VirtualGL/virtualgl/releases/download/3.1.1/virtualgl_3.1.1_amd64.deb" && \
+    dpkg -i virtualgl*.deb
 
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
