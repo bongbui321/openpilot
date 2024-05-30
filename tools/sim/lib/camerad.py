@@ -27,9 +27,7 @@ class Camerad:
 
     # set up for pyopencl rgb to yuv conversion
     self.ctx = cl.create_some_context()
-    print("__c6")
     self.queue = cl.CommandQueue(self.ctx)
-    print("__c7")
     cl_arg = f" -DHEIGHT={H} -DWIDTH={W} -DRGB_STRIDE={W * 3} -DUV_WIDTH={W // 2} -DUV_HEIGHT={H // 2} -DRGB_SIZE={W * H} -DCL_DEBUG "
 
     kernel_fn = os.path.join(BASEDIR, "tools/sim/rgb_to_nv12.cl")

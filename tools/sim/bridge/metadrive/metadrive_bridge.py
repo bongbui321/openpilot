@@ -65,8 +65,6 @@ class MetaDriveBridge(SimulatorBridge):
     if self.dual_camera:
       sensors["rgb_wide"] = (RGBCameraWide, W, H)
 
-    print("+++++++cuda_enabled:", _cuda_enable)
-
     config = dict(
       use_render=self.should_render,
       vehicle_config=dict(

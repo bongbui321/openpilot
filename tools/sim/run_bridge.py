@@ -6,6 +6,10 @@ from multiprocessing import Queue
 
 from openpilot.tools.sim.bridge.metadrive.metadrive_bridge import MetaDriveBridge
 
+from panda3d.core import loadPrcFileData
+loadPrcFileData("", "notify-level-display debug")
+loadPrcFileData("", "notify-level-x11display debug")
+
 def create_bridge(dual_camera, high_quality):
   queue: Any = Queue()
 
