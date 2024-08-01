@@ -3,6 +3,8 @@ openpilot in simulator
 
 openpilot implements a [bridge](run_bridge.py) that allows it to run in the [MetaDrive simulator](https://github.com/metadriverse/metadrive).
 
+Note: simulator is currently only supported for x86 chips
+
 ## Launching openpilot
 First, start openpilot.
 ``` bash
