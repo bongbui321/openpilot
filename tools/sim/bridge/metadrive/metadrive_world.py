@@ -46,9 +46,9 @@ class MetaDriveWorld(World):
     self.metadrive_process.start()
     self.status_q.put(QueueMessage(QueueMessageType.START_STATUS, "starting"))
 
-    print("----------------------------------------------------------")
-    print("---- Spawning Metadrive world, this might take awhile ----")
-    print("----------------------------------------------------------")
+    #print("----------------------------------------------------------")
+    #print("---- Spawning Metadrive world, this might take awhile ----")
+    #print("----------------------------------------------------------")
 
     self.vehicle_last_pos = self.vehicle_state_recv.recv().position # wait for a state message to ensure metadrive is launched
     self.status_q.put(QueueMessage(QueueMessageType.START_STATUS, "started"))

@@ -4,7 +4,7 @@ import functools
 
 from collections import namedtuple
 from enum import Enum
-from multiprocessing import Process, Queue, Value
+from multiprocessing import Process, Queue, Value, Event
 from abc import ABC, abstractmethod
 
 from openpilot.common.params import Params
@@ -38,21 +38,18 @@ class SimulatorBridge(ABC):
   TICKS_PER_FRAME = 5
 
   def __init__(self, dual_camera, high_quality):
-    set_params_enabled()
-    self.params = Params()
-    self.params.put_bool("ExperimentalLongitudinalEnabled", True)
 
     self.rk = Ratekeeper(100, None)
 
     self.dual_camera = dual_camera
     self.high_quality = high_quality
 
-    self._exit_event = threading.Event()
+    self._exit_event = Event()
     self._threads = []
     self._keep_alive = True
     self.started = Value('i', False)
     signal.signal(signal.SIGTERM, self._on_shutdown)
-    self._exit = threading.Event()
+    self._exit = Event()
     self.simulator_state = SimulatorState()
 
     self.world: World | None = None
@@ -62,17 +59,23 @@ class SimulatorBridge(ABC):
 
     self.test_run = False
 
+    self.params = None
+    self.world = None
+    self.simulated_car_thread = None
+    self.simulated_camera_thread = None
+
   def _on_shutdown(self, signal, frame):
     self.shutdown()
 
   def shutdown(self):
     self._keep_alive = False
 
-  def bridge_keep_alive(self, q: Queue, retries: int):
+  @staticmethod
+  def bridge_keep_alive(q: Queue, retries: int, run, close):
     try:
-      self._run(q)
+      run(q)
     finally:
-      self.close("bridge terminated")
+      close("bridge terminated")
 
   def close(self, reason):
     self.started.value = False
@@ -82,7 +85,7 @@ class SimulatorBridge(ABC):
       self.world.close(reason)
 
   def run(self, queue, retries=-1):
-    bridge_p = Process(name="bridge", target=self.bridge_keep_alive, args=(queue, retries))
+    bridge_p = Process(name="bridge", target=self.bridge_keep_alive, args=(queue, retries, self._run, self.close))
     bridge_p.start()
     return bridge_p
 
@@ -98,6 +101,10 @@ Ignition: {self.simulator_state.ignition} Engaged: {self.simulator_state.is_enga
     pass
 
   def _run(self, q: Queue):
+    set_params_enabled()
+    self.params = Params()
+    self.params.put_bool("ExperimentalLongitudinalEnabled", True)
+
     self.world = self.spawn_world(q)
 
     self.simulated_car = SimulatedCar()
@@ -196,8 +203,8 @@ Ignition: {self.simulator_state.ignition} Engaged: {self.simulator_state.is_enga
         self.world.read_cameras()
 
       # don't print during test, so no print/IO Block between OP and metadrive processes
-      if not self.test_run and self.rk.frame % 25 == 0:
-        self.print_status()
+      #if not self.test_run and self.rk.frame % 25 == 0:
+      #  self.print_status()
 
       self.started.value = True
 

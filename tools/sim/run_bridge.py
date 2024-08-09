@@ -40,7 +40,8 @@ if __name__ == "__main__":
     # start input poll for keyboard
     from openpilot.tools.sim.lib.keyboard_ctrl import keyboard_poll_thread
 
-    keyboard_poll_thread(queue)
+    # TODO: enable this in macos
+    #keyboard_poll_thread(queue)
 
   simulator_bridge.shutdown()
 
