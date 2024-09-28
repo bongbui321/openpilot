@@ -136,7 +136,7 @@ class TestLoggerd:
       assert getattr(initData, initData_key) == v
       assert logged_params[param_key].decode() == v
 
-  @pytest.mark.skip("FIXME: encoderd sometimes crashes in CI when running with pytest-xdist")
+  @pytest.mark.order(1)
   def test_rotation(self):
     os.environ["LOGGERD_TEST"] = "1"
     Params().put("RecordFront", "1")
