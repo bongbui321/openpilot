@@ -173,7 +173,7 @@ jobs:
       timeout-minutes: 15
       run: |
         ${{ env.RUN }} "
-                        pip3 install pytest-order && \
+                        python3 -m pip3 install pytest-order && \
                         source selfdrive/test/setup_xvfb.sh && \
                         $PYTEST --timeout 60 -m 'not slow' && \
                         ./selfdrive/ui/tests/create_test_translations.sh && \
